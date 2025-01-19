@@ -109,23 +109,27 @@
             id="imagen" 
             class="block mt-1 w-full " 
             type="file"
-            wire:model="imagen" 
+            wire:model="imagen_nueva" 
             accept="image/*"
          
         />
+        @error('imagen_nueva')
+        <livewire:mostrar-alerta :message="$message">
+        @enderror 
+        {{-- Cuadro donde se muestra la imagen actual --}}
         <div class="my-5 w-80">  
             <x-input-label :value="__('Imagen Actual')"/>
             <img src="{{ asset('storage/vacantes/'.$imagen) }}" alt="{{ 'Imagen Vacante '. $titulo }}" />
         </div>
-        {{-- <div class="my-5">
-            @if ($imagen)
-                    previsualiza la imagen: 
-                    <img src="{{$imagen->temporaryUrl()}}">
+        {{-- Cuadro donde se muestra la imagen nueva --}}
+        <div class="my-5">
+            @if ($imagen_nueva)
+            <x-input-label :value="__('Imagen Nueva')"/>
+                    <img src="{{$imagen_nueva->temporaryUrl()}}">
             @endif
         </div>
-        @error('imagen')
-        <livewire:mostrar-alerta :message="$message">
-        @enderror --}}
+       
+       
     </div>
 
     <x-primary-button>

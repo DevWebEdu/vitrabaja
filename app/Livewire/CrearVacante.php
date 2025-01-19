@@ -17,6 +17,7 @@ class CrearVacante extends Component
     public $ultimo_dia;
     public $descripcion;
     public $imagen;
+    //para trabajar con imagenes
     use WithFileUploads;
 
     protected $rules = [

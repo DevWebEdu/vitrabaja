@@ -7,6 +7,7 @@ use App\Models\Salario;
 use App\Models\Vacante;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class EditarVacante extends Component
 {
@@ -18,18 +19,23 @@ class EditarVacante extends Component
     public $ultimo_dia;
     public $descripcion;
     public $imagen;
+    public $imagen_nueva;
+
+    use WithFileUploads;
 
     protected $rules = [
-        
+
         'titulo' => 'required|string',
         'salario' => 'required',
         'categoria' => 'required',
         'empresa' => 'required',
         'ultimo_dia' => 'required',
-        'descripcion' => 'required'
+        'descripcion' => 'required',
+        'imagen_nueva' => 'nullable|image|max:1024',
     ];
 
-    public function mount(Vacante $vacante){
+    public function mount(Vacante $vacante)
+    {
         $this->vacante_id = $vacante->id;
         $this->titulo = $vacante->titulo;
         $this->salario = $vacante->salario_id;
@@ -39,10 +45,16 @@ class EditarVacante extends Component
         $this->descripcion = $vacante->descripcion;
         $this->imagen = $vacante->imagen;
     }
-    
-    public function editarVacante(){
+
+    public function editarVacante()
+    {
         $datos = $this->validate();
+
         // Si existe una nueva imagen
+        if ($this->imagen_nueva) {
+            $imagen = $this->imagen_nueva->store('public/vacantes');
+            $datos['imagen'] = str_replace('public/vacantes/', '', $imagen);
+        }
 
         // Encontrar la vacante a editar
         $vacante = Vacante::find($this->vacante_id);
@@ -53,15 +65,15 @@ class EditarVacante extends Component
         $vacante->empresa = $datos['empresa'];
         $vacante->ultimo_dia = $datos['ultimo_dia'];
         $vacante->descripcion = $datos['descripcion'];
-
+        $vacante->imagen  = $datos['imagen'] ?? $vacante->imagen;
 
         //Guardar la Vacante
         $vacante->save();
 
         //Redireccionar
-            //Enviar mensaje a la sesion
-        session()->flash('mensaje','La Vacante se actualizó Correctamente');
-            //Enviar el dashboard
+        //Enviar mensaje a la sesion
+        session()->flash('mensaje', 'La Vacante se actualizó Correctamente');
+        //Enviar el dashboard
         return redirect()->route('vacantes.index');
     }
 
@@ -72,9 +84,9 @@ class EditarVacante extends Component
         $salarios = Salario::all();
         $categorias = Categoria::all();
 
-        return view('livewire.editar-vacante',[
-            'salarios'=> $salarios,
-            'categorias' =>$categorias
+        return view('livewire.editar-vacante', [
+            'salarios' => $salarios,
+            'categorias' => $categorias
         ]);
     }
 }
